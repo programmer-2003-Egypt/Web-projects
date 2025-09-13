@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Typing Speed Test</title>
+   <style>
+/* General Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    width: 60%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+#timer, #wpm, #accuracy, #mistakes {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.text-box {
+    background-color: #f1f1f1;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    min-height: 120px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+    min-height: 100px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.controls button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
+.leaderboard {
+    margin-top: 30px;
+    text-align: left;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.leaderboard h2 {
+    font-size: 1.8rem;
+}
+
+ol {
+    padding-left: 0;
+    list-style-type: none;
+}
+
+li {
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button#reset-btn {
+    background-color: #dc3545;
+}
+
+button#reset-btn:hover {
+    background-color: #c82333;
+}
+
+   </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Typing Speed Test</h1>
+        <div id="timer">Time: 0</div>
+        <div id="wpm">WPM(words per minutes): 0</div>
+        <div id="accuracy">Accuracy: 0%</div>
+        <div id="mistakes">Mistakes: 0</div>
+
+        <div class="text-box">
+            <p id="text-display"></p>
+        </div>
+
+        <textarea id="input-area" placeholder="Start typing above text..." autofocus></textarea>
+
+        <div class="controls">
+            <button id="start-btn">Start</button>
+            <button id="reset-btn" disabled>Reset</button>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <ol id="leaderboard-list">
+                <!-- Leaderboard will be populated dynamically -->
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+const resetBtn = document.getElementById('reset-btn');
+const inputArea = document.getElementById('input-area');
+const textDisplay = document.getElementById('text-display');
+const timerDisplay = document.getElementById('timer');
+const wpmDisplay = document.getElementById('wpm');
+const accuracyDisplay = document.getElementById('accuracy');
+const mistakesDisplay = document.getElementById('mistakes');
+const leaderboardList = document.getElementById('leaderboard-list');
+
+let timer;
+let timeLeft = 60;  // 1 minute countdown
+let wpm = 0;
+let mistakes = 0;
+let correctChars = 0;
+let totalChars = 0;
+let textToType = '';
+let startTime = 0;
+let isTyping = false;
+let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+// Words for the typing test
+const words = [
+    'The quick brown fox jumps over the lazy dog.',
+    'Pack my box with five dozen liquor jugs.',
+    'How razorback jumping frogs can level six piqued gymnasts.',
+    'The five boxing wizards jump quickly.',
+    'A quick movement of the enemy will jeopardize six guns.'
+];
+
+// Function to get random text
+function getRandomText() {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    return words[randomIndex];
+}
+
+// Function to update leaderboard
+function updateLeaderboard() {
+    leaderboard.push(wpm);
+    leaderboard = leaderboard.sort((a, b) => b - a).slice(0, 5); // Top 5
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((score, index) => {
+        const li = document.createElement('li');
+        li.textContent = `#${index + 1} - ${score} WPM`;
+        leaderboardList.appendChild(li);
+    });
+}
+
+// Function to reset the game
+function resetGame() {
+    timeLeft = 60;
+    wpm = 0;
+    mistakes = 0;
+    correctChars = 0;
+    totalChars = 0;
+    inputArea.disabled = false;
+    inputArea.value = '';
+    textDisplay.textContent = '';
+    timerDisplay.textContent = `Time: 0`;
+    wpmDisplay.textContent = `WPM: 0`;
+    accuracyDisplay.textContent = `Accuracy: 0%`;
+    mistakesDisplay.textContent = `Mistakes: 0`;
+    startBtn.disabled = false;
+    resetBtn.disabled = true;
+    inputArea.focus();
+}
+
+// Function to start the game
+function startGame() {
+    textToType = getRandomText();
+    textDisplay.textContent = textToType;
+    inputArea.value = '';
+    correctChars = 0;
+    totalChars = 0;
+    mistakes = 0;
+    startTime = Date.now();
+
+    isTyping = true;
+    startBtn.disabled = true;
+    resetBtn.disabled = false;
+
+    // Start the timer
+    timer = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            isTyping = false;
+            inputArea.disabled = true;
+            updateLeaderboard();
+            return;
+        }
+        timeLeft--;
+        timerDisplay.textContent = `Time: ${timeLeft}`;
+    }, 1000);
+}
+
+// Function to calculate WPM and accuracy
+function calculateStats() {
+    totalChars = inputArea.value.length;
+    correctChars = 0;
+    mistakes = 0;
+
+    // Calculate correct characters and mistakes
+    for (let i = 0; i < totalChars; i++) {
+        if (inputArea.value[i] === textToType[i]) {
+            correctChars++;
+        } else {
+            mistakes++;
+        }
+    }
+
+    // Calculate WPM (Words per Minute)
+    wpm = Math.floor((correctChars / 5) / ((Date.now() - startTime) / 60000));
+    wpmDisplay.textContent = `WPM: ${wpm}`;
+
+    // Calculate Accuracy
+    const accuracy = Math.floor((correctChars / totalChars) * 100);
+    accuracyDisplay.textContent = `Accuracy: ${accuracy}%`;
+
+    // Update mistakes
+    mistakesDisplay.textContent = `Mistakes: ${mistakes}`;
+}
+
+// Event listeners
+startBtn.addEventListener('click', startGame);
+resetBtn.addEventListener('click', resetGame);
+inputArea.addEventListener('input', calculateStats);
+
+    </script>
+</body>
+</html>
