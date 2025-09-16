@@ -1,6 +1,6 @@
-# 🎯 Dynamic Trivia Application
+# 🎯 Dynamic question Application
 
-A dynamic and interactive trivia game powered by the **Open Trivia API**, designed to deliver real-time question data with an engaging and smooth user experience.
+A dynamic and interactive question game powered by the **Open Trivia API**, designed to deliver real-time question data with an engaging and smooth user experience.
 
 ---
 
