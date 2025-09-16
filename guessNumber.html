@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Number Guessing Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #1d0d01, #415168);
+            animation: gradientAnimation 12s infinite alternate;
+        }
+
+        @keyframes gradientAnimation {
+            0% {background: linear-gradient(45deg, #d59566, #2c2714);}
+            100% {background: linear-gradient(45deg, #2d092d, #150c1f);}
+        }
+        
+
+        .game-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            position: relative;
+        }
+
+        .difficulty-options {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .difficulty-options button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            width: 30%;
+        }
+
+        .difficulty-options button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 1rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #message {
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-top: 20px;
+        }
+
+        .hint {
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        #score {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        #attempts, #timer {
+            font-size: 1.1rem;
+        }
+
+        .timer-bar-container {
+            width: 100%;
+            background-color: #ddd;
+            height: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: #28a745;
+            width: 100%;
+            border-radius: 10px;
+            transition: width 1s;
+        }
+
+        .animated {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .leaderboard {
+            margin-top: 30px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .leaderboard p {
+            margin: 5px 0;
+        }
+
+        .fa-check-circle {
+            color: green;
+        }
+
+        .fa-times-circle {
+            color: red;
+        }
+
+        .fa-arrow-circle-right {
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Ultimate Number Guessing Game</h1>
+        <p>Guess a number between 1 and <span id="range">100</span></p>
+        <div class="difficulty-options">
+            <button id="easy">Easy (1-50)</button>
+            <button id="medium">Medium (1-100)</button>
+            <button id="hard">Hard (1-200)</button>
+        </div>
+        <input type="number" id="guess" placeholder="Enter your guess" min="1">
+        <button id="submit-guess">Submit Guess</button>
+        <p id="message"></p>
+        <p>Remaining attempts: <span id="attempts">10</span></p>
+        <p id="timer" class="timer">Time remaining: 30s</p>
+        <div class="timer-bar-container">
+            <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <button id="restart" class="hidden">Restart Game</button>
+        <p>Score: <span id="score">0</span></p>
+        <p class="hint" id="hint">Need a hint?</p>
+        <div class="leaderboard hidden" id="leaderboard">
+            <h3>Leaderboard</h3>
+            <p id="highest-score">Highest Score: 0</p>
+        </div>
+    </div>
+    
+    <script>
+        let randomNumber, attemptsLeft, maxRange, countdown, score = 0, timer;
+        let highestScore = parseInt(localStorage.getItem("highestScore")) || 0;
+        const guessInput = document.getElementById("guess");
+        const submitGuessBtn = document.getElementById("submit-guess");
+        const message = document.getElementById("message");
+        const attemptsDisplay = document.getElementById("attempts");
+        const rangeDisplay = document.getElementById("range");
+        const restartBtn = document.getElementById("restart");
+        const timerDisplay = document.getElementById("timer");
+        const scoreDisplay = document.getElementById("score");
+        const hintBtn = document.getElementById("hint");
+        const leaderboard = document.getElementById("leaderboard");
+        const highestScoreDisplay = document.getElementById("highest-score");
+        const timerBar = document.getElementById("timer-bar");
+
+        const startGame = (range, maxAttempts, timeLimit) => {
+            maxRange = range;
+            randomNumber = Math.floor(Math.random() * maxRange) + 1;
+            attemptsLeft = maxAttempts;
+            attemptsDisplay.textContent = attemptsLeft;
+            rangeDisplay.textContent = maxRange;
+            scoreDisplay.textContent = score;
+            message.textContent = "";
+            guessInput.value = "";
+            restartBtn.classList.add("hidden");
+            submitGuessBtn.disabled = false;
+
+            clearInterval(timer);
+            startTimer(timeLimit);
+        };
+
+        const startTimer = (timeLimit) => {
+            let timeLeft = timeLimit;
+            timerDisplay.textContent = `Time remaining: ${timeLeft}s`;
+            timerBar.style.width = '100%';
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time remaining: ${timeLeft}s`;
+                timerBar.style.width = `${(timeLeft / timeLimit) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    message.textContent = "Time's up! Game Over.";
+                    message.style.color = "red";
+                    submitGuessBtn.disabled = true;
+                    restartBtn.classList.remove("hidden");
+                }
+            }, 1000);
+        };
+
+        const updateLeaderboard = () => {
+            if (score > highestScore) {
+                highestScore = score;
+                localStorage.setItem("highestScore", highestScore);
+            }
+            highestScoreDisplay.textContent = `Highest Score: ${highestScore}`;
+            leaderboard.classList.remove("hidden");
+        };
+
+        hintBtn.addEventListener("click", function() {
+            const hint = randomNumber % 2 === 0 ? "Even" : "Odd";
+            message.textContent = `Hint: The number is ${hint}.`;
+            message.style.color = "blue";
+        });
+
+        submitGuessBtn.addEventListener("click", function() {
+            const userGuess = parseInt(guessInput.value);
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > maxRange) {
+                message.textContent = `Please enter a valid number between 1 and ${maxRange}.`;
+                message.style.color = "red";
+                return;
+            }
+
+            attemptsLeft--;
+            attemptsDisplay.textContent = attemptsLeft;
+
+            if (userGuess === randomNumber) {
+                score += 10;
+                message.textContent = "Congratulations! You've guessed the right number!";
+                message.style.color = "green";
+                message.classList.add("animated");
+                submitGuessBtn.disabled = true;
+                updateLeaderboard();
+                restartBtn.classList.remove("hidden");
+            } else if (userGuess < randomNumber) {
+                message.innerHTML = `Too low! Try again. <i class="fas fa-arrow-circle-right"></i>`;
+                message.style.color = "orange";
+            } else {
+                message.innerHTML = `Too high! Try again. <i class="fas fa-arrow-circle-right"></i>`;
+                message.style.color = "orange";
+            }
+
+            if (attemptsLeft === 0) {
+                message.textContent = `Game over! The correct number was ${randomNumber}.`;
+                message.style.color = "red";
+                submitGuessBtn.disabled = true;
+                restartBtn.classList.remove("hidden");
+            }
+
+            guessInput.value = "";
+        });
+
+        restartBtn.addEventListener("click", function() {
+            startGame(maxRange, 10, 30);
+        });
+
+        document.getElementById("easy").addEventListener("click", function() {
+            startGame(50, 10, 30);
+        });
+
+        document.getElementById("medium").addEventListener("click", function() {
+            startGame(100, 10, 30);
+        });
+
+        document.getElementById("hard").addEventListener("click", function() {
+            startGame(200, 10, 60);
+        });
+
+        startGame(100, 10, 30);  // Default starting conditions
+    </script>
+</body>
+</html>
