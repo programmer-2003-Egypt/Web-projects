@@ -99,4 +99,32 @@ Built with **JavaScript, HTML5, and CSS3**, this project combines a robust game 
 
 ---
 
- 
+ # ⌨️ Advanced Typing Speed Test
+
+A modern **Typing Speed Test application** built with **HTML5, CSS3, and JavaScript**.  
+This project uses the **Canvas API** for dynamic UI rendering, real-time performance tracking, and a **leaderboard system** stored in `localStorage`.  
+It challenges users with random typing passages, calculating **WPM**, **accuracy**, and **mistakes** — all within a timed session.
+
+---
+
+## 🚀 Features
+
+- ⏱ **Countdown Timer** – 60-second typing challenge  
+- 📝 **Random Text Generator** – passages chosen dynamically  
+- ⚡ **Real-Time Stats**  
+  - Words Per Minute (WPM)  
+  - Accuracy percentage  
+  - Mistake count  
+- 🏆 **Leaderboard System** – Top 5 scores saved in localStorage  
+- 🎨 **Modern Responsive UI** – clean design with intuitive layout  
+- 🔄 **Start & Reset Controls** – full game loop implementation  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)  
+- **Logic:** DOM Manipulation, Event Listeners, localStorage  
+- **UI:** Responsive CSS, Styled Buttons, Dynamic Leaderboard  
+
+---
