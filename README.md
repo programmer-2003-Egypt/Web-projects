@@ -65,4 +65,38 @@ A modern **digital clock app** built with the **HTML Canvas API** and **JavaScri
 - **Graphics & Animations:** HTML Canvas API  
 
 ---
+# 🎯 Interactive Number Guessing Game
 
+An engaging **number guessing game** with multiple difficulty levels and real-time feedback.  
+Built with **JavaScript, HTML5, and CSS3**, this project combines a robust game engine with immersive UI elements, ensuring a fun and seamless experience across devices.  
+
+---
+
+## 🚀 Features
+
+- 🔢 **Random Number Generation**  
+  - Unique number generated for each session  
+  - Difficulty levels adjust the number range  
+
+- 🎮 **Core Game Loop**  
+  - Structured attempt system (up to 7 guesses)  
+  - Intelligent feedback: *"Too high"* or *"Too low"*  
+
+- 🌈 **User Experience Enhancements**  
+  - Color-coded UI feedback for guesses  
+  - Smooth animations and immersive sound effects  
+
+- ⚡ **Optimized Game Logic**  
+  - Efficient state management  
+  - Responsive design for all devices  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)  
+- **UI Enhancements:** CSS Animations, Audio API  
+
+---
+
+ 
