@@ -128,3 +128,32 @@ It challenges users with random typing passages, calculating **WPM**, **accuracy
 - **UI:** Responsive CSS, Styled Buttons, Dynamic Leaderboard  
 
 ---
+# 🔗 Advanced URL Shortener
+
+A modern **URL Shortener application** built with **HTML5, Tailwind CSS, and JavaScript (ES6+)**.  
+This app allows users to shorten long URLs, generate **custom aliases**, copy links to the clipboard, and even create **QR codes** for easy sharing.  
+It includes a **dark mode toggle**, **link history management**, and a clean responsive design powered by TailwindCSS.  
+
+---
+
+## ✨ Features
+
+- 🔗 **Shorten URLs** with random codes or custom aliases  
+- 📋 **Copy links** to clipboard with one click  
+- 📱 **Generate QR codes** for shortened links  
+- 🗑️ **Delete links** from history instantly  
+- 🔍 **Search & filter saved links**  
+- 🌓 **Dark Mode toggle** (saved in localStorage)  
+- 📜 **Link history persistence**  
+- 🎨 **Modern UI** with Tailwind CSS and Lucide icons  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** HTML5, TailwindCSS, JavaScript (ES6+)  
+- **Icons:** [Lucide Icons](https://lucide.dev/)  
+- **QR Code Generator:** [qrcodejs](https://github.com/davidshimjs/qrcodejs)  
+- **Persistence:** localStorage  
+
+---
